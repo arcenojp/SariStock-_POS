@@ -37,15 +37,15 @@ class ReportsManager {
     async loadKPIData() {
         try {
             // Get today's summary
-            const todayResponse = await fetch('php/sales/Read.php?today_summary=true');
+            const todayResponse = await fetch('php/sales/sales.php?today_summary=true');
             const todayResult = await todayResponse.json();
             
             // Get total sales data (you might need to adjust dates for this)
-            const salesResponse = await fetch('php/sales/Read.php');
+            const salesResponse = await fetch('php/sales/sales.php');
             const salesResult = await salesResponse.json();
             
             // Get low stock products for inventory insights
-            const productsResponse = await fetch('php/products/Read.php');
+            const productsResponse = await fetch('php/products/sales.php');
             const productsResult = await productsResponse.json();
             
             if (todayResult.success && salesResult.success && productsResult.success) {
@@ -109,7 +109,7 @@ class ReportsManager {
             const startDateStr = startDate.toISOString().split('T')[0];
             const endDateStr = endDate.toISOString().split('T')[0];
             
-            const response = await fetch(`php/sales/Read.php?start_date=${startDateStr}&end_date=${endDateStr}`);
+            const response = await fetch(`php/sales/sales.php?start_date=${startDateStr}&end_date=${endDateStr}`);
             const result = await response.json();
             
             if (result.success) {
@@ -202,7 +202,7 @@ class ReportsManager {
 
     async generateProductsChart() {
         try {
-            const response = await fetch('php/products/Read.php');
+            const response = await fetch('php/products/products.php');
             const result = await response.json();
             
             if (result.success) {
@@ -299,7 +299,7 @@ class ReportsManager {
             switch (reportType) {
                 case 'sales':
                     headers = ['Date', 'Transaction ID', 'Customer', 'Amount', 'Payment Method'];
-                    const salesResponse = await fetch('php/sales/Read.php');
+                    const salesResponse = await fetch('php/sales/sales.php');
                     const salesResult = await salesResponse.json();
                     
                     if (salesResult.success) {
@@ -315,7 +315,7 @@ class ReportsManager {
                     
                 case 'inventory':
                     headers = ['Product', 'Category', 'Current Stock', 'Price', 'Status'];
-                    const productsResponse = await fetch('php/products/Read.php');
+                    const productsResponse = await fetch('php/products/products.php');
                     const productsResult = await productsResponse.json();
                     
                     if (productsResult.success) {
@@ -331,7 +331,7 @@ class ReportsManager {
                     
                 case 'customer':
                     headers = ['Customer', 'Contact', 'Email', 'Total Orders'];
-                    const customersResponse = await fetch('php/customers/Read.php');
+                    const customersResponse = await fetch('php/customers/customers.php');
                     const customersResult = await customersResponse.json();
                     
                     if (customersResult.success) {
@@ -346,7 +346,7 @@ class ReportsManager {
                     
                 case 'employee':
                     headers = ['Employee', 'Role', 'Status'];
-                    const employeesResponse = await fetch('php/employees/Read.php');
+                    const employeesResponse = await fetch('php/employees/employees.php');
                     const employeesResult = await employeesResponse.json();
                     
                     if (employeesResult.success) {

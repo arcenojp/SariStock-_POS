@@ -16,7 +16,7 @@ class ProductsManager {
             const formData = new FormData();
             formData.append('action', 'read');
 
-            const response = await fetch('php/categories.php', {
+            const response = await fetch('php/categories/categories.php', {
                 method: 'POST',
                 body: formData
             });
@@ -60,7 +60,7 @@ class ProductsManager {
             if (filters.Status) formData.append('Status', filters.Status);
             if (filters.search) formData.append('search', filters.search);
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -125,7 +125,7 @@ class ProductsManager {
             formData.append('Barcode', productData.Barcode);
             formData.append('Status', productData.Status);
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -157,7 +157,7 @@ class ProductsManager {
             formData.append('Barcode', productData.Barcode);
             formData.append('Status', productData.Status);
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -187,7 +187,7 @@ class ProductsManager {
             formData.append('action', 'delete');
             formData.append('Product_ID', productId);
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -212,7 +212,7 @@ class ProductsManager {
             formData.append('action', 'read');
             formData.append('Product_ID', productId);
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });

@@ -15,7 +15,7 @@ class CustomersManager {
             formData.append('action', 'read');
             if (search) formData.append('search', search);
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });
@@ -77,7 +77,7 @@ class CustomersManager {
             formData.append('Email', customerData.Email);
             formData.append('Address', customerData.Address);
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });
@@ -107,7 +107,7 @@ class CustomersManager {
             formData.append('Email', customerData.Email);
             formData.append('Address', customerData.Address);
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });
@@ -137,7 +137,7 @@ class CustomersManager {
             formData.append('action', 'delete');
             formData.append('Customer_ID', customerId);
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });
@@ -162,7 +162,7 @@ class CustomersManager {
             formData.append('action', 'read');
             formData.append('Customer_ID', customerId);
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });

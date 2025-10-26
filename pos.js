@@ -22,7 +22,7 @@ class PointOfSale {
             const formData = new FormData();
             formData.append('action', 'read');
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -45,7 +45,7 @@ class PointOfSale {
             const formData = new FormData();
             formData.append('action', 'read');
 
-            const response = await fetch('php/customers.php', {
+            const response = await fetch('php/customers/customers.php', {
                 method: 'POST',
                 body: formData
             });
@@ -354,7 +354,7 @@ class PointOfSale {
             formData.append('Payment_Method', this.selectedPaymentMethod);
             formData.append('items', JSON.stringify(this.cart));
 
-            const response = await fetch('php/sales.php', {
+            const response = await fetch('php/sales/sales.php', {
                 method: 'POST',
                 body: formData
             });

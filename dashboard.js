@@ -37,7 +37,7 @@ class Dashboard {
             formData.append('action', 'read');
             formData.append('today_summary', 'true');
 
-            const response = await fetch('php/sales.php', {
+            const response = await fetch('php/sales/sales.php', {
                 method: 'POST',
                 body: formData
             });
@@ -56,7 +56,7 @@ class Dashboard {
             formData.append('action', 'read');
             formData.append('low_stock', 'true');
 
-            const response = await fetch('php/products.php', {
+            const response = await fetch('php/products/products.php', {
                 method: 'POST',
                 body: formData
             });
@@ -96,7 +96,7 @@ class Dashboard {
             const formData = new FormData();
             formData.append('action', 'read');
 
-            const response = await fetch('php/sales.php', {
+            const response = await fetch('php/sales/sales.php', {
                 method: 'POST',
                 body: formData
             });

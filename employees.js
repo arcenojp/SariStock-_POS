@@ -18,7 +18,7 @@ class EmployeesManager {
             if (filters.Status) formData.append('Status', filters.Status);
             if (filters.search) formData.append('search', filters.search);
 
-            const response = await fetch('php/employees.php', {
+            const response = await fetch('php/employees/employees.php', {
                 method: 'POST',
                 body: formData
             });
@@ -81,7 +81,7 @@ class EmployeesManager {
             formData.append('Role', employeeData.Role);
             formData.append('Status', employeeData.Status);
 
-            const response = await fetch('php/employees.php', {
+            const response = await fetch('php/employees/employees.php', {
                 method: 'POST',
                 body: formData
             });
@@ -115,7 +115,7 @@ class EmployeesManager {
                 formData.append('password', employeeData.password);
             }
 
-            const response = await fetch('php/employees.php', {
+            const response = await fetch('php/employees/employees.php', {
                 method: 'POST',
                 body: formData
             });
@@ -152,7 +152,7 @@ class EmployeesManager {
             formData.append('action', 'delete');
             formData.append('Employee_ID', employeeId);
 
-            const response = await fetch('php/employees.php', {
+            const response = await fetch('php/employees/employees.php', {
                 method: 'POST',
                 body: formData
             });
@@ -177,7 +177,7 @@ class EmployeesManager {
             formData.append('action', 'read');
             formData.append('Employee_ID', employeeId);
 
-            const response = await fetch('php/employees.php', {
+            const response = await fetch('php/employees/employees.php', {
                 method: 'POST',
                 body: formData
             });

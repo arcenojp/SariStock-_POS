@@ -11,7 +11,7 @@ class CategoriesManager {
 
     async loadCategories() {
         try {
-            const response = await fetch('php/categories/Read.php');
+            const response = await fetch('php/categories/categories.php');
             const result = await response.json();
             
             if (result.success) {
@@ -62,7 +62,7 @@ class CategoriesManager {
             const formData = new FormData();
             formData.append('Category_Name', categoryData.Category_Name);
 
-            const response = await fetch('php/categories/Create.php', {
+            const response = await fetch('php/categories/categories.php', {
                 method: 'POST',
                 body: formData
             });
@@ -88,7 +88,7 @@ class CategoriesManager {
             formData.append('Category_ID', categoryId);
             formData.append('Category_Name', categoryData.Category_Name);
 
-            const response = await fetch('php/categories/Update.php', {
+            const response = await fetch('php/categories/categories.php', {
                 method: 'POST',
                 body: formData
             });
@@ -117,7 +117,7 @@ class CategoriesManager {
             const formData = new FormData();
             formData.append('Category_ID', categoryId);
 
-            const response = await fetch('php/categories/Delete.php', {
+            const response = await fetch('php/categories/categories.php', {
                 method: 'POST',
                 body: formData
             });
@@ -140,7 +140,7 @@ class CategoriesManager {
         // For separate CRUD, we need to get single category
         // We'll modify Read.php to accept an ID parameter
         try {
-            const response = await fetch(`php/categories/Read.php?Category_ID=${categoryId}`);
+            const response = await fetch(`php/categories/categories.php?Category_ID=${categoryId}`);
             const result = await response.json();
             
             if (result.success && result.data.length > 0) {

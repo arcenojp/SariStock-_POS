@@ -12,7 +12,7 @@ class TransactionsManager {
     async loadTransactions(filters = {}) {
         try {
             // Build URL with filters
-            let url = 'php/sales/Read.php';
+            let url = 'php/sales/sales.php';
             const params = new URLSearchParams();
             
             if (filters.start_date) params.append('start_date', filters.start_date);
@@ -80,7 +80,7 @@ class TransactionsManager {
 
     async viewTransactionDetails(saleId) {
         try {
-            const response = await fetch(`php/sales/Read.php?Sale_ID=${saleId}`);
+            const response = await fetch(`php/sales/sales.php?Sale_ID=${saleId}`);
             const result = await response.json();
             
             if (result.success) {
@@ -104,7 +104,7 @@ class TransactionsManager {
             formData.append('Sale_ID', saleId);
             formData.append('Status', 0); // 0 means refunded
 
-            const response = await fetch('php/sales/Update.php', {
+            const response = await fetch('php/sales/sales.php', {
                 method: 'POST',
                 body: formData
             });

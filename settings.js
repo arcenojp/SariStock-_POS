@@ -79,19 +79,16 @@ class SettingsManager {
 
     async loadSettings() {
         try {
-            // Try to load settings from server first
-            const response = await fetch('php/settings/Read.php');
+            const response = await fetch('php/settings/settings.php');
             const result = await response.json();
             
             if (result.success) {
                 this.populateSettings(result.data);
             } else {
-                // Fallback to localStorage
                 this.loadSettingsFromLocalStorage();
             }
         } catch (error) {
             console.error('Error loading settings from server:', error);
-            // Fallback to localStorage
             this.loadSettingsFromLocalStorage();
         }
     }
@@ -135,8 +132,6 @@ class SettingsManager {
     }
 
     populateSettings(serverSettings) {
-        // If you have server-side settings, populate them here
-        // For now, we'll use localStorage
         this.populateStoreSettings(this.getStoreSettings());
         this.populateReceiptSettings(this.getReceiptSettings());
         this.populateTaxSettings(this.getTaxSettings());
@@ -174,12 +169,11 @@ class SettingsManager {
         };
 
         try {
-            // Try to save to server
             const formData = new FormData();
             formData.append('settings', JSON.stringify(settings));
             formData.append('type', 'store');
             
-            const response = await fetch('php/settings/Update.php', {
+            const response = await fetch('php/settings/settings.php', {
                 method: 'POST',
                 body: formData
             });
@@ -189,12 +183,10 @@ class SettingsManager {
             if (result.success) {
                 window.posApp.showNotification('Store settings saved to server', 'success');
             } else {
-                // Fallback to localStorage
                 localStorage.setItem('storeSettings', JSON.stringify(settings));
                 window.posApp.showNotification('Store settings saved locally', 'success');
             }
         } catch (error) {
-            // Fallback to localStorage
             localStorage.setItem('storeSettings', JSON.stringify(settings));
             window.posApp.showNotification('Store settings saved locally', 'success');
         }
@@ -214,7 +206,7 @@ class SettingsManager {
             formData.append('settings', JSON.stringify(settings));
             formData.append('type', 'receipt');
             
-            const response = await fetch('php/settings/Update.php', {
+            const response = await fetch('php/settings/settings.php', {
                 method: 'POST',
                 body: formData
             });
@@ -245,7 +237,7 @@ class SettingsManager {
             formData.append('settings', JSON.stringify(settings));
             formData.append('type', 'tax');
             
-            const response = await fetch('php/settings/Update.php', {
+            const response = await fetch('php/settings/settings.php', {
                 method: 'POST',
                 body: formData
             });
@@ -266,15 +258,19 @@ class SettingsManager {
 
     async createBackup() {
         try {
-            const response = await fetch('php/backup/Create.php', {
-                method: 'POST'
+            const formData = new FormData();
+            formData.append('action', 'create');
+
+            const response = await fetch('php/backup.php', {
+                method: 'POST',
+                body: formData
             });
             
             const result = await response.json();
             
             if (result.success) {
                 window.posApp.showNotification('Database backup created successfully', 'success');
-                this.loadSystemInfo(); // Refresh backup list
+                this.loadBackupList();
             } else {
                 window.posApp.showNotification('Backup failed: ' + result.message, 'error');
             }
@@ -284,34 +280,116 @@ class SettingsManager {
         }
     }
 
-    async restoreBackup() {
-        if (confirm('Are you sure you want to restore from backup? This will overwrite current data.')) {
-            try {
-                const response = await fetch('php/backup/Restore.php', {
-                    method: 'POST'
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    window.posApp.showNotification('Database restored successfully', 'success');
-                } else {
-                    window.posApp.showNotification('Restore failed: ' + result.message, 'error');
-                }
-            } catch (error) {
-                console.error('Restore error:', error);
-                window.posApp.showNotification('Restore feature requires server setup', 'info');
+    async restoreBackup(backupFile = null) {
+        if (!backupFile) {
+            const backups = await this.getBackupList();
+            if (backups.length === 0) {
+                window.posApp.showNotification('No backup files found', 'error');
+                return;
             }
+            backupFile = backups[0].filename;
         }
+
+        if (!confirm(`Are you sure you want to restore from backup: ${backupFile}? This will overwrite current data.`)) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'restore');
+            formData.append('filename', backupFile);
+
+            const response = await fetch('php/backup.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.posApp.showNotification('Database restored successfully', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                window.posApp.showNotification('Restore failed: ' + result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Restore error:', error);
+            window.posApp.showNotification('Restore feature requires server setup', 'info');
+        }
+    }
+
+    async getBackupList() {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'list');
+
+            const response = await fetch('php/backup.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                return result.data;
+            }
+            return [];
+        } catch (error) {
+            console.error('Error getting backup list:', error);
+            return [];
+        }
+    }
+
+    async loadBackupList() {
+        const backups = await this.getBackupList();
+        this.renderBackupList(backups);
+    }
+
+    renderBackupList(backups) {
+        const backupListElement = document.getElementById('backupList');
+        if (!backupListElement) return;
+
+        if (backups.length === 0) {
+            backupListElement.innerHTML = '<p>No backups available</p>';
+            return;
+        }
+
+        let html = `
+            <div style="margin-bottom: 15px;">
+                <strong>Available Backups:</strong>
+            </div>
+        `;
+
+        backups.forEach(backup => {
+            const sizeKB = Math.round(backup.size / 1024);
+            html += `
+                <div style="display: flex; justify-content: between; align-items: center; padding: 10px; border: 1px solid #ddd; margin-bottom: 5px; border-radius: 5px;">
+                    <div style="flex: 1;">
+                        <div><strong>${backup.filename}</strong></div>
+                        <div style="font-size: 12px; color: #666;">
+                            ${backup.created} • ${sizeKB} KB
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="settingsManager.restoreBackup('${backup.filename}')" style="padding: 5px 10px;">
+                            <i class="fas fa-undo"></i> Restore
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        backupListElement.innerHTML = html;
     }
 
     async loadSystemInfo() {
         try {
-            // Get database stats
             const [productsResponse, customersResponse, salesResponse] = await Promise.all([
-                fetch('php/products/Read.php'),
-                fetch('php/customers/Read.php'),
-                fetch('php/sales/Read.php')
+                fetch('php/products/products.php'),
+                fetch('php/customers/customers.php'),
+                fetch('php/sales/sales.php')
             ]);
 
             const [productsResult, customersResult, salesResult] = await Promise.all([
