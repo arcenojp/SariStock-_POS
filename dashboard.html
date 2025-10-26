@@ -1,0 +1,223 @@
+
+              <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+               <i class="fas fa-shopping-bag"></i>
+                <h1>SariStock</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="pos.html"><i class="fas fa-shopping-cart"></i> Point of Sale</a></li>
+                <li><a href="products.html"><i class="fas fa-boxes"></i> Products</a></li>
+                <li><a href="categories.html"><i class="fas fa-tags"></i> Categories</a></li>
+                <li><a href="transactions.html"><i class="fas fa-receipt"></i> Transactions</a></li>
+                <li><a href="customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="employees.html"><i class="fas fa-user-tie"></i> Employees</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+    <a href="#" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Dashboard</h2>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="User">
+                        <div>
+                            <div>Sarah Johnson</div>
+                            <div style="font-size: 12px; color: var(--gray);">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- KPI Cards -->
+            <div class="kpi-cards">
+                <div class="card sales">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>TODAY'S SALES</h3>
+                            <div class="value" id="todaySales">$0.00</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span id="salesTrend">0%</span> from yesterday
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card transactions">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>TRANSACTIONS</h3>
+                            <div class="value" id="todayTransactions">0</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span id="transactionsTrend">0%</span> from yesterday
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card customers">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>NEW CUSTOMERS</h3>
+                            <div class="value" id="newCustomers">0</div>
+                            <div class="trend down">
+                                <i class="fas fa-arrow-down"></i> <span id="customersTrend">0%</span> from last week
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card products">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>LOW STOCK ITEMS</h3>
+                            <div class="value" id="lowStockItems">0</div>
+                            <div class="trend up">
+                                <i class="fas fa-exclamation-triangle"></i> Needs attention
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales Overview</h3>
+                        <div class="chart-actions">
+                            <select id="salesPeriod">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 3 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales by Category</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tables Section -->
+            <div class="tables">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Recent Transactions</h3>
+                        <a href="transactions.html">View All</a>
+                    </div>
+                    <div id="recentTransactions">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Time</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Low Stock Products</h3>
+                        <a href="products.html">View All</a>
+                    </div>
+                    <div id="lowStockProducts">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+// Check if system needs setup on app load
+async function checkSystemSetup() {
+    try {
+        const response = await fetch('php/setup/CheckSetup.php');
+        const result = await response.json();
+        
+        if (result.needs_setup && !window.location.href.includes('setup.html')) {
+            window.location.href = 'setup.html';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Setup check failed:', error);
+        return true;
+    }
+}
+
+// Call this when your app starts
+checkSystemSetup();
+</script>
+</body>
+</html>

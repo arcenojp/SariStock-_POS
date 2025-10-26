@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shopping-bag"></i>
+                <h1>SariStock</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="pos.html"><i class="fas fa-shopping-cart"></i> Point of Sale</a></li>
+                <li><a href="products.html"><i class="fas fa-boxes"></i> Products</a></li>
+                <li><a href="categories.html"><i class="fas fa-tags"></i> Categories</a></li>
+                <li><a href="transactions.html"><i class="fas fa-receipt"></i> Transactions</a></li>
+                <li><a href="customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="employees.html"><i class="fas fa-user-tie"></i> Employees</a></li>
+                <li><a href="reports.html" class="active"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+    <a href="#" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Reports & Analytics</h2>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="User">
+                        <div>
+                            <div>Sarah Johnson</div>
+                            <div style="font-size: 12px; color: var(--gray);">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Filters -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Report Type</label>
+                        <select id="reportType" class="form-control">
+                            <option value="sales">Sales Report</option>
+                            <option value="inventory">Inventory Report</option>
+                            <option value="customer">Customer Report</option>
+                            <option value="employee">Employee Performance</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Date Range</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="date" id="reportStartDate" class="form-control">
+                            <input type="date" id="reportEndDate" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <button class="btn btn-primary" id="generateReport">
+                            <i class="fas fa-chart-bar"></i> Generate Report
+                        </button>
+                        <button class="btn" id="exportReport" style="margin-left: 10px;">
+                            <i class="fas fa-download"></i> Export PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Summary Cards -->
+            <div class="kpi-cards">
+                <div class="card sales">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>TOTAL SALES</h3>
+                            <div class="value" id="totalSales">$0.00</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span id="salesGrowth">0%</span> growth
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card transactions">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>TOTAL TRANSACTIONS</h3>
+                            <div class="value" id="totalTransactions">0</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span id="transactionGrowth">0%</span> growth
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card customers">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>AVERAGE ORDER VALUE</h3>
+                            <div class="value" id="averageOrder">$0.00</div>
+                            <div class="trend down">
+                                <i class="fas fa-arrow-down"></i> <span id="aovChange">0%</span> change
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-shopping-basket"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card products">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h3>TOP SELLING CATEGORY</h3>
+                            <div class="value" id="topCategory">-</div>
+                            <div class="trend up">
+                                <i class="fas fa-star"></i> Best performer
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales Trend</h3>
+                        <div class="chart-actions">
+                            <select id="chartPeriod">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Top Products</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Report Table -->
+            <div class="card">
+                <div class="table-header">
+                    <h3>Detailed Report Data</h3>
+                    <div>
+                        <button class="btn" id="exportDataBtn">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div id="reportData">
+                    <table>
+                        <thead>
+                            <tr id="reportHeaders">
+                                <!-- Headers will be loaded dynamically based on report type -->
+                            </tr>
+                        </thead>
+                        <tbody id="reportTable">
+                            <!-- Report data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

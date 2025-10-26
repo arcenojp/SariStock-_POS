@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Point of Sale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shopping-bag"></i>
+                <h1>SariStock</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="pos.html" class="active"><i class="fas fa-shopping-cart"></i> Point of Sale</a></li>
+                <li><a href="products.html"><i class="fas fa-boxes"></i> Products</a></li>
+                <li><a href="categories.html"><i class="fas fa-tags"></i> Categories</a></li>
+                <li><a href="transactions.html"><i class="fas fa-receipt"></i> Transactions</a></li>
+                <li><a href="customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="employees.html"><i class="fas fa-user-tie"></i> Employees</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+    <a href="#" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Point of Sale</h2>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="User">
+                        <div>
+                            <div>Sarah Johnson</div>
+                            <div style="font-size: 12px; color: var(--gray);">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POS Interface -->
+            <div class="pos-container">
+                <!-- Products Section -->
+                <div class="products-section">
+                    <div class="card">
+                        <div class="table-header">
+                            <h3>Products</h3>
+                            <div>
+                                <select id="categoryFilter" class="form-control" style="width: auto; display: inline-block;">
+                                    <option value="">All Categories</option>
+                                    <option value="1">Electronics</option>
+                                    <option value="2">Beverages</option>
+                                    <option value="3">Snacks</option>
+                                    <option value="4">Accessories</option>
+                                </select>
+                                <input type="text" id="productSearch" placeholder="Search products..." class="form-control" style="width: auto; display: inline-block; margin-left: 10px;">
+                            </div>
+                        </div>
+                        <div class="products-grid" id="productsGrid">
+                            <!-- Products will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Section -->
+                <div class="cart-section">
+                    <div class="cart-container">
+                        <h3>Current Sale</h3>
+                        <div class="cart-items" id="cartItems">
+                            <!-- Cart items will be loaded dynamically -->
+                            <div class="empty-cart" style="text-align: center; padding: 40px; color: var(--gray);">
+                                <i class="fas fa-shopping-cart" style="font-size: 48px; margin-bottom: 15px;"></i>
+                                <p>Your cart is empty</p>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-total">
+                            <div class="total-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="total-row">
+                                <span>Tax (10%):</span>
+                                <span id="tax">$0.00</span>
+                            </div>
+                            <div class="total-row final">
+                                <span>Total:</span>
+                                <span id="total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="payment-section">
+                            <h4>Payment Method</h4>
+                            <div class="payment-methods">
+                                <div class="payment-method" data-method="cash">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <div>Cash</div>
+                                </div>
+                                <div class="payment-method" data-method="card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <div>Card</div>
+                                </div>
+                                <div class="payment-method" data-method="gcash">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <div>GCash</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customerSelect">Customer (Optional)</label>
+                                <select id="customerSelect" class="form-control">
+                                    <option value="">Walk-in Customer</option>
+                                    <option value="1">John Doe</option>
+                                    <option value="2">Jane Smith</option>
+                                    <option value="3">Mike Johnson</option>
+                                </select>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="btn btn-danger" id="clearCart" style="width: 48%;">Clear Cart</button>
+                                <button class="btn btn-success" id="completeSale" style="width: 48%;">Complete Sale</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/pos.js"></script>
+</body>
+</html>

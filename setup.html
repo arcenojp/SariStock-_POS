@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Setup - Sari-Sari Store POS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #b16035 0%, #954c1f 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .setup-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .setup-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .setup-info h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .setup-info ul {
+            padding-left: 20px;
+            color: #555;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-setup {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-setup:hover {
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .system-ready {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .system-ready .btn-login {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="logo">
+            <i class="fas fa-shopping-bag" style="font-size: 2.5rem; color: #667eea; margin-bottom: 1rem;"></i>
+            <h1>SariStock POS</h1>
+            <p>Initial System Setup</p>
+        </div>
+
+        <div id="alertMessage" class="alert"></div>
+
+        <div id="setupFormContainer">
+            <div class="setup-info">
+                <h3><i class="fas fa-info-circle"></i> System Setup Required</h3>
+                <p>This is the initial setup of your POS system. You need to create the first administrator account.</p>
+                <ul>
+                    <li>This can only be done once</li>
+                    <li>You'll use this account to manage other users</li>
+                    <li>Choose a strong password</li>
+                </ul>
+            </div>
+
+            <form id="setupForm">
+                <div class="form-group">
+                    <label for="fullName">Your Full Name *</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Admin Username *</label>
+                    <input type="text" id="username" placeholder="Choose a username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Admin Password *</label>
+                    <input type="password" id="password" placeholder="Choose a strong password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+
+                <button type="submit" class="btn-setup">
+                    <i class="fas fa-cogs"></i> Complete System Setup
+                </button>
+            </form>
+        </div>
+
+        <div id="systemReady" class="system-ready" style="display: none;">
+            <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745; margin-bottom: 1rem;"></i>
+            <h3>System Ready!</h3>
+            <p>Your POS system has been successfully set up.</p>
+            <a href="login.html" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Go to Login
+            </a>
+        </div>
+    </div>
+
+    <script>
+        class SetupManager {
+            constructor() {
+                this.init();
+            }
+
+            async init() {
+                await this.checkSetupStatus();
+                this.setupEventListeners();
+            }
+
+            async checkSetupStatus() {
+                try {
+                    const response = await fetch('php/setup/CheckSetup.php');
+                    const result = await response.json();
+                    
+                    if (!result.needs_setup) {
+                        this.showSystemReady();
+                    }
+                } catch (error) {
+                    console.error('Setup check failed:', error);
+                    this.showAlert('Error checking system status', 'error');
+                }
+            }
+
+            setupEventListeners() {
+                const form = document.getElementById('setupForm');
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSetup();
+                });
+
+                // Real-time password validation
+                confirmPassword.addEventListener('input', () => {
+                    this.checkPasswordMatch();
+                });
+            }
+
+            checkPasswordMatch() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const confirmElement = document.getElementById('confirmPassword');
+
+                if (confirmPassword.length > 0 && password !== confirmPassword) {
+                    confirmElement.style.borderColor = '#dc3545';
+                } else if (confirmPassword.length > 0) {
+                    confirmElement.style.borderColor = '#28a745';
+                } else {
+                    confirmElement.style.borderColor = '#e1e1e1';
+                }
+            }
+
+            async handleSetup() {
+                const fullName = document.getElementById('fullName').value.trim();
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Validation
+                if (!fullName || !username || !password || !confirmPassword) {
+                    this.showAlert('Please fill all required fields', 'error');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showAlert('Passwords do not match', 'error');
+                    return;
+                }
+
+                if (password.length < 8) {
+                    this.showAlert('Password must be at least 8 characters long', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('php/setup/CheckSetup.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password,
+                            full_name: fullName
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showAlert('System setup completed successfully!', 'success');
+                        this.showSystemReady();
+                    } else {
+                        this.showAlert('Setup failed: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Setup error:', error);
+                    this.showAlert('Network error during setup', 'error');
+                }
+            }
+
+            showSystemReady() {
+                document.getElementById('setupFormContainer').style.display = 'none';
+                document.getElementById('systemReady').style.display = 'block';
+            }
+
+            showAlert(message, type) {
+                const alertElement = document.getElementById('alertMessage');
+                alertElement.textContent = message;
+                alertElement.className = `alert alert-${type}`;
+                alertElement.style.display = 'block';
+
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize setup manager
+        document.addEventListener('DOMContentLoaded', function() {
+            new SetupManager();
+        });
+    </script>
+</body>
+</html>

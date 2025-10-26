@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shopping-bag"></i>
+                <h1>SariStock</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="pos.html"><i class="fas fa-shopping-cart"></i> Point of Sale</a></li>
+                <li><a href="products.html"><i class="fas fa-boxes"></i> Products</a></li>
+                <li><a href="categories.html"><i class="fas fa-tags"></i> Categories</a></li>
+                <li><a href="transactions.html"><i class="fas fa-receipt"></i> Transactions</a></li>
+                <li><a href="customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                <li><a href="employees.html"><i class="fas fa-user-tie"></i> Employees</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+    <a href="#" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>System Settings</h2>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="User">
+                        <div>
+                            <div>Sarah Johnson</div>
+                            <div style="font-size: 12px; color: var(--gray);">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Navigation -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="display: flex; border-bottom: 1px solid var(--light-gray);">
+                    <button class="tab-btn active" data-tab="general">General</button>
+                    <button class="tab-btn" data-tab="receipt">Receipt Settings</button>
+                    <button class="tab-btn" data-tab="tax">Tax Settings</button>
+                    <button class="tab-btn" data-tab="backup">Backup & Restore</button>
+                </div>
+            </div>
+
+            <!-- General Settings -->
+            <div id="general-tab" class="settings-tab active">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Store Information</h3>
+                    <form id="storeSettingsForm">
+                        <div class="form-group">
+                            <label for="storeName">Store Name *</label>
+                            <input type="text" id="storeName" class="form-control" value="My POS Store" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="storeAddress">Store Address</label>
+                            <textarea id="storeAddress" class="form-control" rows="3">123 Main Street, City, State 12345</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="storePhone">Phone Number</label>
+                            <input type="text" id="storePhone" class="form-control" value="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="storeEmail">Email Address</label>
+                            <input type="email" id="storeEmail" class="form-control" value="info@mystore.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" class="form-control">
+                                <option value="USD">US Dollar ($)</option>
+                                <option value="EUR">Euro (€)</option>
+                                <option value="GBP">British Pound (£)</option>
+                                <option value="PHP">Philippine Peso (₱)</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Receipt Settings -->
+            <div id="receipt-tab" class="settings-tab" style="display: none;">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Receipt Configuration</h3>
+                    <form id="receiptSettingsForm">
+                        <div class="form-group">
+                            <label for="receiptHeader">Receipt Header Text</label>
+                            <textarea id="receiptHeader" class="form-control" rows="3">Thank you for shopping with us!</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="receiptFooter">Receipt Footer Text</label>
+                            <textarea id="receiptFooter" class="form-control" rows="3">Please come again!</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="showTax" checked> Show tax breakdown
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="showBarcode" checked> Show barcode on receipt
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="receiptWidth">Receipt Width (characters)</label>
+                            <input type="number" id="receiptWidth" class="form-control" value="42" min="30" max="80">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tax Settings -->
+            <div id="tax-tab" class="settings-tab" style="display: none;">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Tax Configuration</h3>
+                    <form id="taxSettingsForm">
+                        <div class="form-group">
+                            <label for="taxRate">Default Tax Rate (%)</label>
+                            <input type="number" id="taxRate" class="form-control" value="10.0" step="0.1" min="0" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="taxInclusive" checked> Prices include tax
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="multipleTax" > Enable multiple tax rates
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Backup & Restore Tab -->
+<div id="backup-tab" class="settings-tab" style="display: none;">
+    
+    <!-- Backup Controls Card -->
+    <div class="card">
+        <h3 style="margin-bottom: 20px;">Database Backup & Restore</h3>
+        
+        <!-- Create Backup Section -->
+        <div class="form-group">
+            <label><i class="fas fa-download"></i> Create New Backup</label>
+            <p style="color: #666; margin: 5px 0 15px 0; font-size: 14px;">
+                Create a complete backup of your database including all products, customers, sales, and settings.
+            </p>
+            <button class="btn btn-primary" id="backupBtn" style="width: 200px;">
+                <i class="fas fa-download"></i> Create Backup Now
+            </button>
+        </div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+
+        <!-- Restore Backup Section -->
+        <div class="form-group">
+            <label><i class="fas fa-upload"></i> Restore from Backup</label>
+            <p style="color: #666; margin: 5px 0 15px 0; font-size: 14px;">
+                Restore your database from a previous backup. This will overwrite all current data.
+            </p>
+            <button class="btn" id="restoreBtn" style="width: 200px; background: #ffc107; color: #000;">
+                <i class="fas fa-upload"></i> Restore Backup
+            </button>
+        </div>
+    </div>
+
+    <!-- Available Backups Card -->
+    <div class="card">
+        <h3 style="margin-bottom: 15px;">Available Backups</h3>
+        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+            Recent backup files that you can restore from.
+        </p>
+        <div id="backupList">
+            <!-- Backup list will be dynamically loaded here -->
+            <div style="text-align: center; padding: 30px; color: #666;">
+                <i class="fas fa-database" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>No backups available yet</p>
+                <p style="font-size: 12px;">Create your first backup using the button above</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Information Card -->
+    <div class="card">
+        <h3 style="margin-bottom: 15px;">Backup Information</h3>
+        <div style="font-size: 14px; color: #666;">
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Location:</strong></span>
+                <span>/backups/ directory</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Format:</strong></span>
+                <span>SQL files</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Includes:</strong></span>
+                <span>All tables & data</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Security:</strong></span>
+                <span>Admin access only</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                <span><strong>Auto-cleanup:</strong></span>
+                <span>Keep last 10 backups</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information Card -->
+    <div class="card">
+        <h3 style="margin-bottom: 15px;">System Information</h3>
+        <div id="systemInfo" style="font-size: 14px;">
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>POS System Version:</strong></span>
+                <span>v2.1.0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Database Version:</strong></span>
+                <span>MySQL 8.0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Total Products:</strong></span>
+                <span id="infoProducts">Loading...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Total Customers:</strong></span>
+                <span id="infoCustomers">Loading...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                <span><strong>Total Sales:</strong></span>
+                <span id="infoSales">Loading...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                <span><strong>Last Update:</strong></span>
+                <span id="infoLastUpdate">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>
