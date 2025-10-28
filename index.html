@@ -71,45 +71,58 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
         }
 
+        .members {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #ddd;
+        }
 
+        .members h4 {
+            color: #5c2706;
+            margin-bottom: 0.5rem;
+        }
 
+        .members h5 {
+            color: #333;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="logo">
-            <i class="fas fa-shopping-bag" style="font-size: 2.5rem; color: #f46100; margin-bottom: 1rem;"></i>
+            <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #fa7d00; margin-bottom: 1rem;"></i>
             <h1>SariStock POS</h1>
             <p>
-We have built a Point of Sale (POS) system for a Sari-Sari store.
- The system is designed to handle various aspects of the store's
- operations, including sales, inventory, customer management,
- employee management, and reporting.</p>
+                We have built a Point of Sale (POS) system for a Sari-Sari store.
+                The system is designed to handle various aspects of the store's
+                operations, including sales, inventory, customer management,
+                employee management, and reporting.
+            </p>
 
- <br>
- <h4>Members:</h4>
- <p></p>
- <h5>Arceño Jan Perry H.</h5>
-    <h5>Forcado Alea Ann M.</h5>
-    <h5>Pentoque,Maeden J.</h5>
+            <div class="members">
+                <h4>Members:</h4>
+                <h5>Arceño Jan Perry H.</h5>
+                <h5>Forcado Alea Ann M.</h5>
+                <h5>Pentoque, Maeden J.</h5>
+            </div>
         </div>
-        <form id="loginForm">
-
-            <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i> Proceed <a href="login.html"> </a>
-            </button>
-
         
-        </form>
-     
-        </div>
+        <!-- Fixed button with link to login.html -->
+        <a href="login.html" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Proceed to Login
+        </a>
     </div>
 </body>
-
 </html>
+
