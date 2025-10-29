@@ -1,7 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json');
-require_once 'config.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -9,25 +9,31 @@ $db = $database->getConnection();
 $action = $_POST['action'] ?? '';
 
 try {
-    switch($action) {
+    switch ($action) {
+
+        // -----------------------------
+        // CREATE SALE
+        // -----------------------------
         case 'create':
             $customerId = $_POST['Customer_ID'] ?? null;
-            $cashierId = $_SESSION['employee_id'];
-            $totalAmount = $_POST['TotalAmount'];
-            $paymentMethod = $_POST['Payment_Method'];
-            $items = json_decode($_POST['items'], true);
+            $cashierId = $_POST['Cashier_ID'] ?? ($_SESSION['employee_id'] ?? $_SESSION['user_id'] ?? 0);
+            $totalAmount = $_POST['TotalAmount'] ?? null;
+            $paymentMethod = $_POST['Payment_Method'] ?? null;
+            $items = isset($_POST['items']) ? json_decode($_POST['items'], true) : [];
 
-            if (empty($cashierId) || empty($totalAmount) || empty($paymentMethod) || empty($items)) {
-                echo json_encode(['success' => false, 'message' => 'Required data is missing']);
-                break;
+            if ($totalAmount === null || $paymentMethod === null || empty($items)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Missing required data (cashier, total, payment method, or items).'
+                ]);
+                exit;
             }
 
-            // Start transaction
             $db->beginTransaction();
 
             try {
                 // Insert sale
-                $sql = "INSERT INTO sales (Sale_Date, Customer_ID, Cashier_ID, TotalAmount, Payment_Method, Status) 
+                $sql = "INSERT INTO sales (Sale_Date, Customer_ID, Cashier_ID, TotalAmount, Payment_Method, Status)
                         VALUES (NOW(), :customer_id, :cashier_id, :total_amount, :payment_method, 'Completed')";
                 $stmt = $db->prepare($sql);
                 $stmt->bindParam(':customer_id', $customerId);
@@ -38,37 +44,51 @@ try {
 
                 $saleId = $db->lastInsertId();
 
-                // Insert sale items and update product stock
-                foreach ($items as $item) {
-                    // Insert sale item
-                    $itemSql = "INSERT INTO sales_detail (Sale_ID, Product_ID, Quantity, Price, SubTotal) 
-                                VALUES (:sale_id, :product_id, :quantity, :price, :subtotal)";
-                    $itemStmt = $db->prepare($itemSql);
-                    $itemStmt->bindParam(':sale_id', $saleId);
-                    $itemStmt->bindParam(':product_id', $item['Product_ID']);
-                    $itemStmt->bindParam(':quantity', $item['Quantity']);
-                    $itemStmt->bindParam(':price', $item['Price']);
-                    $itemStmt->bindParam(':subtotal', $item['SubTotal']);
-                    $itemStmt->execute();
+                // Insert sale items
+                $itemSql = "INSERT INTO sales_detail (Sale_ID, Product_ID, Quantity, Price, SubTotal)
+                            VALUES (:sale_id, :product_id, :quantity, :price, :subtotal)";
+                $itemStmt = $db->prepare($itemSql);
 
-                    // Update product stock
-                    $updateSql = "UPDATE product SET Stock_Quantity = Stock_Quantity - :quantity 
-                                  WHERE Product_ID = :product_id";
-                    $updateStmt = $db->prepare($updateSql);
-                    $updateStmt->bindParam(':quantity', $item['Quantity']);
-                    $updateStmt->bindParam(':product_id', $item['Product_ID']);
-                    $updateStmt->execute();
+                // Update stock
+                $updateSql = "UPDATE product 
+                              SET Stock_Quantity = Stock_Quantity - :quantity 
+                              WHERE Product_ID = :product_id";
+                $updateStmt = $db->prepare($updateSql);
+
+                foreach ($items as $item) {
+                    $itemStmt->execute([
+                        ':sale_id' => $saleId,
+                        ':product_id' => $item['Product_ID'],
+                        ':quantity' => $item['Quantity'],
+                        ':price' => $item['Price'],
+                        ':subtotal' => $item['SubTotal']
+                    ]);
+
+                    $updateStmt->execute([
+                        ':quantity' => $item['Quantity'],
+                        ':product_id' => $item['Product_ID']
+                    ]);
                 }
 
                 $db->commit();
-                echo json_encode(['success' => true, 'message' => 'Sale completed successfully', 'Sale_ID' => $saleId]);
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Sale completed successfully.',
+                    'Sale_ID' => $saleId
+                ]);
 
             } catch (Exception $e) {
                 $db->rollBack();
-                throw $e;
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Transaction failed: ' . $e->getMessage()
+                ]);
             }
             break;
 
+        // -----------------------------
+        // READ SALE(S)
+        // -----------------------------
         case 'read':
             $saleId = $_POST['Sale_ID'] ?? null;
             $startDate = $_POST['start_date'] ?? null;
@@ -77,11 +97,11 @@ try {
             $status = $_POST['Status'] ?? null;
 
             if ($saleId) {
-                // Read single sale with items
-                $saleSql = "SELECT s.*, c.Name as customer_name, e.Full_Name as cashier_name 
-                            FROM sales s 
-                            LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID 
-                            LEFT JOIN employee e ON s.Cashier_ID = e.Employee_ID 
+                // Single sale with items
+                $saleSql = "SELECT s.*, c.Name AS customer_name, e.Full_Name AS cashier_name
+                            FROM sales s
+                            LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID
+                            LEFT JOIN employee e ON s.Cashier_ID = e.Employee_ID
                             WHERE s.Sale_ID = :sale_id";
                 $saleStmt = $db->prepare($saleSql);
                 $saleStmt->bindParam(':sale_id', $saleId);
@@ -89,67 +109,71 @@ try {
                 $sale = $saleStmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($sale) {
-                    // Get sale items
-                    $itemsSql = "SELECT sd.*, p.Product_Name 
-                                 FROM sales_detail sd 
-                                 JOIN product p ON sd.Product_ID = p.Product_ID 
+                    $itemsSql = "SELECT sd.*, p.Product_Name
+                                 FROM sales_detail sd
+                                 JOIN product p ON sd.Product_ID = p.Product_ID
                                  WHERE sd.Sale_ID = :sale_id";
                     $itemsStmt = $db->prepare($itemsSql);
                     $itemsStmt->bindParam(':sale_id', $saleId);
                     $itemsStmt->execute();
-                    $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+                    $sale['items'] = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    $sale['items'] = $items;
-                    echo json_encode(['success' => true, 'data' => [$sale]]);
+                    echo json_encode(['success' => true, 'data' => $sale]);
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Sale not found']);
                 }
+
             } else {
-                // Read all sales with filters
-                $sql = "SELECT s.*, c.Name as customer_name, e.Full_Name as cashier_name 
-                        FROM sales s 
-                        LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID 
-                        LEFT JOIN employee e ON s.Cashier_ID = e.Employee_ID 
+                // All sales with filters
+                $sql = "SELECT s.*, c.Name AS customer_name, e.Full_Name AS cashier_name
+                        FROM sales s
+                        LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID
+                        LEFT JOIN employee e ON s.Cashier_ID = e.Employee_ID
                         WHERE 1=1";
                 $params = [];
 
-                if (!empty($startDate)) {
+                if ($startDate) {
                     $sql .= " AND DATE(s.Sale_Date) >= :start_date";
                     $params[':start_date'] = $startDate;
                 }
-
-                if (!empty($endDate)) {
+                if ($endDate) {
                     $sql .= " AND DATE(s.Sale_Date) <= :end_date";
                     $params[':end_date'] = $endDate;
                 }
-
-                if (!empty($paymentMethod)) {
+                if ($paymentMethod) {
                     $sql .= " AND s.Payment_Method = :payment_method";
                     $params[':payment_method'] = $paymentMethod;
                 }
-
-                if (!empty($status)) {
+                if ($status) {
                     $sql .= " AND s.Status = :status";
                     $params[':status'] = $status;
                 }
 
                 $sql .= " ORDER BY s.Sale_Date DESC";
-
                 $stmt = $db->prepare($sql);
-                foreach ($params as $key => $value) {
-                    $stmt->bindValue($key, $value);
+
+                foreach ($params as $key => $val) {
+                    $stmt->bindValue($key, $val);
                 }
+
                 $stmt->execute();
                 $sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
+
                 echo json_encode(['success' => true, 'data' => $sales]);
             }
             break;
 
+        // -----------------------------
+        // UPDATE SALE STATUS
+        // -----------------------------
         case 'update':
-            // For refunds or status updates
-            $saleId = $_POST['Sale_ID'];
-            $status = $_POST['Status'];
+            $saleId = $_POST['Sale_ID'] ?? null;
+            $status = $_POST['Status'] ?? null;
+
+            if (!$saleId || !$status) {
+                echo json_encode(['success' => false, 'message' => 'Missing Sale_ID or Status']);
+                exit;
+            }
 
             $sql = "UPDATE sales SET Status = :status WHERE Sale_ID = :sale_id";
             $stmt = $db->prepare($sql);
@@ -157,19 +181,26 @@ try {
             $stmt->bindParam(':sale_id', $saleId);
 
             if ($stmt->execute()) {
-                echo json_encode(['success' => true, 'message' => 'Sale updated successfully']);
+                echo json_encode(['success' => true, 'message' => 'Sale status updated successfully.']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to update sale']);
+                echo json_encode(['success' => false, 'message' => 'Failed to update sale.']);
             }
             break;
 
+        // -----------------------------
+        // INVALID ACTION
+        // -----------------------------
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
+
 } catch (PDOException $e) {
     if ($db->inTransaction()) {
         $db->rollBack();
     }
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
 }
 ?>
