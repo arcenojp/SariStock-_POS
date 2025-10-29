@@ -1,10 +1,11 @@
 class PointOfSale {
+    static WALKIN_CUSTOMER_ID = 5;
     constructor() {
         this.cart = [];
         this.products = [];
         this.customers = [];
         this.selectedPaymentMethod = null;
-        this.taxRate = 0.10; // 10% VAT
+        this.taxRate = 0.10; 
         this.currentUser = window.posApp?.currentUser || { Role: 'Admin', Username: 'admin' };
 
         this.init();
@@ -150,6 +151,9 @@ class PointOfSale {
                     <i class="fas fa-shopping-cart" style="font-size:48px;margin-bottom:15px;"></i>
                     <p>Your cart is empty</p>
                 </div>`;
+            const cashInput = document.getElementById('cashGiven');
+            if (cashInput) cashInput.value = '';
+            this.calculateChange();
             return;
         }
 
@@ -182,6 +186,8 @@ class PointOfSale {
         document.getElementById('subtotal').textContent = window.posApp.formatCurrency(subtotal);
         document.getElementById('tax').textContent = window.posApp.formatCurrency(tax);
         document.getElementById('total').textContent = window.posApp.formatCurrency(total);
+
+        this.calculateChange();
     }
 
     increaseQuantity(id) {
@@ -194,16 +200,52 @@ class PointOfSale {
         if (item) this.updateQuantity(id, item.Quantity - 1);
     }
 
+    calculateChange() {
+        if (this.selectedPaymentMethod === 'cash') {
+            const cashEl = document.getElementById('cashGiven');
+            const cash = parseFloat(cashEl?.value) || 0;
+            const subtotal = this.cart.reduce((s, i) => s + (i.SubTotal || 0), 0);
+            const total = subtotal + (subtotal * this.taxRate);
+            const change = cash - total;
+            const changeEl = document.getElementById('changeAmount');
+            
+            if (changeEl) {
+                if (change >= 0) {
+                    changeEl.textContent = window.posApp.formatCurrency(change);
+                    changeEl.style.color = 'var(--success)';
+                } else {
+                    changeEl.textContent = window.posApp.formatCurrency(Math.abs(change)) + ' (Insufficient)';
+                    changeEl.style.color = 'var(--danger)';
+                }
+            }
+        }
+    }
+
     setupEventListeners() {
         document.querySelectorAll('.payment-method').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 this.selectedPaymentMethod = btn.getAttribute('data-method');
+                
+                
+                const cashInputSection = document.getElementById('cashInputSection');
+                if (this.selectedPaymentMethod === 'cash') {
+                    cashInputSection.style.display = 'block';
+                    this.calculateChange();
+                } else {
+                    cashInputSection.style.display = 'none';
+                }
             });
         });
 
-        document.getElementById('clearCart')?.addEventListener('click', () => this.clearCart());
+       
+        document.getElementById('cashGiven')?.addEventListener('input', () => this.calculateChange());
+        
+        document.getElementById('clearCart')?.addEventListener('click', () => {
+            this.clearCart();
+            this.calculateChange();
+        });
         document.getElementById('completeSale')?.addEventListener('click', () => this.completeSale());
 
         document.getElementById('categoryFilter')?.addEventListener('change', e => this.filterProducts(e.target.value));
@@ -225,8 +267,26 @@ class PointOfSale {
             window.posApp.showNotification('Please select a payment method', 'error');
             return;
         }
+        
+      
+        if(this.selectedPaymentMethod === 'cash'){
+            const cashEl = document.getElementById('cashGiven');
+            const cash = parseFloat(cashEl?.value) || 0;
+            const subtotal = this.cart.reduce((s,i)=>s + (i.SubTotal||0), 0);
+            const total = subtotal + (subtotal * this.taxRate);
+            if(cash < total){ 
+                window.posApp.showNotification('Cash given is insufficient','error'); 
+                return; 
+            }
+        }
 
-        const customerId = document.getElementById('customerSelect')?.value || '';
+        const customerSelect = document.getElementById('customerSelect');
+        let customerId = customerSelect?.value || '';
+        
+       
+        if (!customerId || customerId === '') {
+            customerId = '5'; 
+
         const total = this.cart.reduce((s, i) => s + i.SubTotal, 0) * (1 + this.taxRate);
 
         try {
@@ -247,6 +307,10 @@ class PointOfSale {
                 this.clearCart();
                 document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('selected'));
                 this.selectedPaymentMethod = null;
+                
+              
+                if (customerSelect) customerSelect.value = '';
+                
                 await this.loadProducts();
             } else {
                 window.posApp.showNotification('Error completing sale: ' + result.message, 'error');
@@ -255,6 +319,58 @@ class PointOfSale {
             console.error('Error completing sale:', err);
             window.posApp.showNotification('Error completing sale', 'error');
         }
+    }
+
+    filterProducts(categoryId) {
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        
+        let filteredProducts = this.products;
+        if (categoryId) {
+            filteredProducts = this.products.filter(product => product.Category_ID == categoryId);
+        }
+
+        filteredProducts.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <i class="fas fa-box" style="font-size: 32px; color: var(--primary);"></i>
+                <h4>${product.Product_Name}</h4>
+                <div class="price">${window.posApp.formatCurrency(product.Price)}</div>
+                <div class="stock">Stock: ${product.Stock_Quantity}</div>
+            `;
+            card.addEventListener('click', () => this.addToCart(product));
+            grid.appendChild(card);
+        });
+    }
+
+    searchProducts(searchTerm) {
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        
+        let filteredProducts = this.products;
+        if (searchTerm) {
+            filteredProducts = this.products.filter(product => 
+                product.Product_Name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        filteredProducts.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <i class="fas fa-box" style="font-size: 32px; color: var(--primary);"></i>
+                <h4>${product.Product_Name}</h4>
+                <div class="price">${window.posApp.formatCurrency(product.Price)}</div>
+                <div class="stock">Stock: ${product.Stock_Quantity}</div>
+            `;
+            card.addEventListener('click', () => this.addToCart(product));
+            grid.appendChild(card);
+        });
     }
 }
 
