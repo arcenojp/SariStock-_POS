@@ -160,113 +160,53 @@
                 </div>
             </div>
 
-            <!-- Backup & Restore Tab -->
-<div id="backup-tab" class="settings-tab" style="display: none;">
-    
-    <!-- Backup Controls Card -->
-    <div class="card">
-        <h3 style="margin-bottom: 20px;">Database Backup & Restore</h3>
-        
-        <!-- Create Backup Section -->
-        <div class="form-group">
-            <label><i class="fas fa-download"></i> Create New Backup</label>
-            <p style="color: #666; margin: 5px 0 15px 0; font-size: 14px;">
-                Create a complete backup of your database including all products, customers, sales, and settings.
-            </p>
-            <button class="btn btn-primary" id="backupBtn" style="width: 200px;">
-                <i class="fas fa-download"></i> Create Backup Now
-            </button>
-        </div>
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
-
-        <!-- Restore Backup Section -->
-        <div class="form-group">
-            <label><i class="fas fa-upload"></i> Restore from Backup</label>
-            <p style="color: #666; margin: 5px 0 15px 0; font-size: 14px;">
-                Restore your database from a previous backup. This will overwrite all current data.
-            </p>
-            <button class="btn" id="restoreBtn" style="width: 200px; background: #ffc107; color: #000;">
-                <i class="fas fa-upload"></i> Restore Backup
-            </button>
-        </div>
-    </div>
-
-    <!-- Available Backups Card -->
-    <div class="card">
-        <h3 style="margin-bottom: 15px;">Available Backups</h3>
-        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
-            Recent backup files that you can restore from.
-        </p>
-        <div id="backupList">
-            <!-- Backup list will be dynamically loaded here -->
-            <div style="text-align: center; padding: 30px; color: #666;">
-                <i class="fas fa-database" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
-                <p>No backups available yet</p>
-                <p style="font-size: 12px;">Create your first backup using the button above</p>
+            <!-- Backup & Restore -->
+            <div id="backup-tab" class="settings-tab" style="display: none;">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Backup & Restore</h3>
+                    <div class="form-group">
+                        <label>Database Backup</label>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn btn-primary" id="backupBtn">
+                                <i class="fas fa-download"></i> Create Backup
+                            </button>
+                            <button class="btn" id="restoreBtn">
+                                <i class="fas fa-upload"></i> Restore Backup
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Recent Backups</label>
+                        <div class="card" style="background: var(--light-gray); padding: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ccc;">
+                                <span>backup_2024_01_15.sql</span>
+                                <span>15 Jan 2024, 14:30</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                <span>backup_2024_01_14.sql</span>
+                                <span>14 Jan 2024, 14:30</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>System Information</label>
+                        <div class="card" style="background: var(--light-gray); padding: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>POS System Version:</span>
+                                <span>v2.1.0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>Database Version:</span>
+                                <span>MySQL 8.0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>Last Update:</span>
+                                <span>January 15, 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Backup Information Card -->
-    <div class="card">
-        <h3 style="margin-bottom: 15px;">Backup Information</h3>
-        <div style="font-size: 14px; color: #666;">
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Location:</strong></span>
-                <span>/backups/ directory</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Format:</strong></span>
-                <span>SQL files</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Includes:</strong></span>
-                <span>All tables & data</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Security:</strong></span>
-                <span>Admin access only</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                <span><strong>Auto-cleanup:</strong></span>
-                <span>Keep last 10 backups</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- System Information Card -->
-    <div class="card">
-        <h3 style="margin-bottom: 15px;">System Information</h3>
-        <div id="systemInfo" style="font-size: 14px;">
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>POS System Version:</strong></span>
-                <span>v2.1.0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Database Version:</strong></span>
-                <span>MySQL 8.0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Total Products:</strong></span>
-                <span id="infoProducts">Loading...</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Total Customers:</strong></span>
-                <span id="infoCustomers">Loading...</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span><strong>Total Sales:</strong></span>
-                <span id="infoSales">Loading...</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                <span><strong>Last Update:</strong></span>
-                <span id="infoLastUpdate">Loading...</span>
-            </div>
-        </div>
-    </div>
-
-</div>
         </div>
     </div>
 
