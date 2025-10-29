@@ -1,7 +1,8 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json');
-require_once 'config.php';
+require_once __DIR__ . '/../config.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -68,7 +69,7 @@ function getReceiptSettings() {
         'receiptHeader' => $_SESSION['receipt_header'] ?? 'Thank you for shopping with us!',
         'receiptFooter' => $_SESSION['receipt_footer'] ?? 'Please come again!',
         'showTax' => $_SESSION['show_tax'] ?? true,
-        'showBarcode' => $_SESSION['show_barcode'] ?? true,
+        'show' => $_SESSION['show_'] ?? true,
         'receiptWidth' => $_SESSION['receipt_width'] ?? 42
     ];
 }
@@ -93,7 +94,7 @@ function saveReceiptSettings($settings) {
     $_SESSION['receipt_header'] = $settings['receiptHeader'];
     $_SESSION['receipt_footer'] = $settings['receiptFooter'];
     $_SESSION['show_tax'] = $settings['showTax'];
-    $_SESSION['show_barcode'] = $settings['showBarcode'];
+    $_SESSION['show_'] = $settings['show'];
     $_SESSION['receipt_width'] = $settings['receiptWidth'];
 }
 
