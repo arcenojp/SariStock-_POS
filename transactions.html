@@ -99,6 +99,8 @@
                         <button class="btn" id="exportTransactionsBtn">
                             <i class="fas fa-download"></i> Export
                         </button>
+
+                        
                     </div>
                 </div>
                 <table>
@@ -127,7 +129,7 @@
         <div class="card" style="width: 700px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
             <div class="table-header">
                 <h3>Transaction Details</h3>
-                <button class="close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer;" onclick="closeTransactionModal()">&times;</button>
+                <button class="close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer;" onclick="transactionsManager.closeTransactionModal()">&times;</button>
             </div>
             <div id="transactionDetails">
                 <!-- Transaction details will be loaded dynamically -->
