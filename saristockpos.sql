@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 25, 2025 at 07:05 PM
+-- Generation Time: Oct 29, 2025 at 05:30 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -32,7 +32,17 @@ CREATE TABLE IF NOT EXISTS `category` (
   `Category_ID` int NOT NULL AUTO_INCREMENT,
   `Category_Name` varchar(50) NOT NULL,
   PRIMARY KEY (`Category_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `category`
+--
+
+INSERT INTO `category` (`Category_ID`, `Category_Name`) VALUES
+(11, 'Electronics'),
+(12, 'Bevereges'),
+(13, 'Snacks'),
+(14, 'Accessories');
 
 -- --------------------------------------------------------
 
@@ -48,7 +58,16 @@ CREATE TABLE IF NOT EXISTS `customer` (
   `Email` varchar(100) NOT NULL,
   `Address` text NOT NULL,
   PRIMARY KEY (`Customer_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `customer`
+--
+
+INSERT INTO `customer` (`Customer_ID`, `Name`, `Contact_Number`, `Email`, `Address`) VALUES
+(2, 'TJ', '09486029868', 'Tj@gmail.com', 'Jaro Iloilo City'),
+(3, 'Chris', '09386029868', 'Chris@gmail.com', 'Manduriao Iloilo City'),
+(4, 'Kenth', '09786029868', 'Kenth@gmail.com', 'lapaz Iloilo City');
 
 -- --------------------------------------------------------
 
@@ -65,14 +84,17 @@ CREATE TABLE IF NOT EXISTS `employee` (
   `Role` enum('Admin','Cashier') NOT NULL,
   `Status` enum('Active','Inactive') NOT NULL,
   PRIMARY KEY (`Employee_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `employee`
 --
 
 INSERT INTO `employee` (`Employee_ID`, `username`, `password`, `Full_Name`, `Role`, `Status`) VALUES
-(1, 'jpadmin', 'jepx31416123', 'Arceno JP', 'Admin', 'Active');
+(1, 'mae', 'mae11111', 'Maeden Pentoque', 'Cashier', 'Active'),
+(2, 'alea', 'alea2222', 'alea Ann Forcado', 'Admin', 'Active'),
+(3, 'jp', 'jp333333', 'Jp Arceno', 'Admin', 'Active'),
+(4, '', '', '', 'Admin', '');
 
 -- --------------------------------------------------------
 
@@ -91,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `Status` enum('Active','Inactive') NOT NULL,
   PRIMARY KEY (`Product_ID`),
   KEY `Category_ID` (`Category_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
