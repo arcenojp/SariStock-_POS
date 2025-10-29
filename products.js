@@ -92,7 +92,6 @@ class ProductsManager {
                 <td>${product.Category_Name || 'Uncategorized'}</td>
                 <td>${window.posApp.formatCurrency(product.Price)}</td>
                 <td class="${product.Stock_Quantity <= 10 ? 'low-stock' : ''}">${product.Stock_Quantity}</td>
-                <td>${product.Barcode}</td>
                 <td><span class="status ${product.Status.toLowerCase()}">${product.Status}</span></td>
                 <td>
                     <button class="btn" onclick="productsManager.editProduct(${product.Product_ID})" style="padding: 5px 10px; margin-right: 5px;">
@@ -122,7 +121,6 @@ class ProductsManager {
             formData.append('Category_ID', productData.Category_ID);
             formData.append('Price', productData.Price);
             formData.append('Stock_Quantity', productData.Stock_Quantity);
-            formData.append('Barcode', productData.Barcode);
             formData.append('Status', productData.Status);
 
             const response = await fetch('php/products/products.php', {
@@ -154,7 +152,6 @@ class ProductsManager {
             formData.append('Category_ID', productData.Category_ID);
             formData.append('Price', productData.Price);
             formData.append('Stock_Quantity', productData.Stock_Quantity);
-            formData.append('Barcode', productData.Barcode);
             formData.append('Status', productData.Status);
 
             const response = await fetch('php/products/products.php', {
@@ -239,7 +236,6 @@ class ProductsManager {
         const productCategory = document.getElementById('productCategory');
         const productPrice = document.getElementById('productPrice');
         const productStock = document.getElementById('productStock');
-        const productBarcode = document.getElementById('productBarcode');
         const productStatus = document.getElementById('productStatus');
 
         if (mode === 'create') {
@@ -254,7 +250,6 @@ class ProductsManager {
             productCategory.value = product.Category_ID;
             productPrice.value = product.Price;
             productStock.value = product.Stock_Quantity;
-            productBarcode.value = product.Barcode;
             productStatus.value = product.Status;
         }
 
@@ -267,18 +262,15 @@ class ProductsManager {
     }
 
     setupEventListeners() {
-        // Add product button
         document.getElementById('addProductBtn').addEventListener('click', () => {
             this.openModal('create');
         });
 
-        // Product form submission
         document.getElementById('productForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleFormSubmit();
         });
 
-        // Filters
         document.getElementById('categoryFilter').addEventListener('change', (e) => {
             this.applyFilters();
         });
@@ -291,7 +283,6 @@ class ProductsManager {
             this.applyFilters();
         });
 
-        // Export products
         document.getElementById('exportProductsBtn').addEventListener('click', () => {
             this.exportProducts();
         });
@@ -303,7 +294,6 @@ class ProductsManager {
         const categoryId = document.getElementById('productCategory').value;
         const price = parseFloat(document.getElementById('productPrice').value);
         const stockQuantity = parseInt(document.getElementById('productStock').value);
-        const barcode = document.getElementById('productBarcode').value.trim();
         const status = document.getElementById('productStatus').value;
 
         if (!productName || !categoryId || price <= 0 || stockQuantity < 0) {
@@ -316,15 +306,12 @@ class ProductsManager {
             Category_ID: categoryId,
             Price: price,
             Stock_Quantity: stockQuantity,
-            Barcode: barcode,
             Status: status
         };
 
         if (productId) {
-            // Update existing product
             this.updateProduct(productId, productData);
         } else {
-            // Create new product
             this.createProduct(productData);
         }
     }
@@ -340,15 +327,13 @@ class ProductsManager {
     }
 
     exportProducts() {
-        // Simple CSV export
-        const headers = ['ID', 'Product Name', 'Category', 'Price', 'Stock', 'Barcode', 'Status'];
+        const headers = ['ID', 'Product Name', 'Category', 'Price', 'Stock', 'Status'];
         const csvData = this.products.map(product => [
             product.Product_ID,
             product.Product_Name,
             product.Category_Name,
             product.Price,
             product.Stock_Quantity,
-            product.Barcode,
             product.Status
         ]);
 
@@ -367,12 +352,10 @@ class ProductsManager {
     }
 }
 
-// Global functions for modal
 function closeProductModal() {
     window.productsManager.closeModal();
 }
 
-// Initialize products manager
 document.addEventListener('DOMContentLoaded', function() {
     window.productsManager = new ProductsManager();
 });
