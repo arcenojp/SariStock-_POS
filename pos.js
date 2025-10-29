@@ -4,9 +4,9 @@ class PointOfSale {
         this.products = [];
         this.customers = [];
         this.selectedPaymentMethod = null;
-        this.taxRate = 0.10; // 10% tax
-        this.currentEmployee = window.posApp ? window.posApp.currentUser : { Employee_ID: 1 }; // Default employee
-        
+        this.taxRate = 0.10; // 10% VAT
+        this.currentUser = window.posApp?.currentUser || { Role: 'Admin', Username: 'admin' };
+
         this.init();
     }
 
@@ -28,15 +28,15 @@ class PointOfSale {
             });
 
             const result = await response.json();
-            
+
             if (result.success) {
-                this.products = result.data.filter(product => product.Status === 'Active');
+                this.products = result.data.filter(p => p.Status === 'Active');
                 this.renderProducts();
             } else {
                 console.error('Error loading products:', result.message);
             }
-        } catch (error) {
-            console.error('Error loading products:', error);
+        } catch (err) {
+            console.error('Error loading products:', err);
         }
     }
 
@@ -51,277 +51,163 @@ class PointOfSale {
             });
 
             const result = await response.json();
-            
+
             if (result.success) {
                 this.customers = result.data;
                 this.populateCustomerSelect();
             }
-        } catch (error) {
-            console.error('Error loading customers:', error);
+        } catch (err) {
+            console.error('Error loading customers:', err);
         }
     }
 
     populateCustomerSelect() {
-        const customerSelect = document.getElementById('customerSelect');
-        if (customerSelect) {
-            customerSelect.innerHTML = '<option value="">Walk-in Customer</option>';
-            this.customers.forEach(customer => {
-                customerSelect.innerHTML += `<option value="${customer.Customer_ID}">${customer.Name}</option>`;
-            });
-        }
+        const select = document.getElementById('customerSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Walk-in Customer</option>';
+        this.customers.forEach(c => {
+            select.innerHTML += `<option value="${c.Customer_ID}">${c.Name}</option>`;
+        });
     }
 
     renderProducts() {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
 
-        productsGrid.innerHTML = '';
-
+        grid.innerHTML = '';
         this.products.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.innerHTML = `
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
                 <i class="fas fa-box" style="font-size: 32px; color: var(--primary);"></i>
                 <h4>${product.Product_Name}</h4>
                 <div class="price">${window.posApp.formatCurrency(product.Price)}</div>
                 <div class="stock">Stock: ${product.Stock_Quantity}</div>
             `;
-
-            productCard.addEventListener('click', () => {
-                this.addToCart(product);
-            });
-
-            productsGrid.appendChild(productCard);
+            card.addEventListener('click', () => this.addToCart(product));
+            grid.appendChild(card);
         });
     }
 
     addToCart(product) {
-        const existingItem = this.cart.find(item => item.Product_ID === product.Product_ID);
-        
-        if (existingItem) {
-            if (existingItem.Quantity < product.Stock_Quantity) {
-                existingItem.Quantity++;
-                existingItem.SubTotal = existingItem.Quantity * existingItem.Price;
+        const existing = this.cart.find(i => i.Product_ID === product.Product_ID);
+
+        if (existing) {
+            if (existing.Quantity < product.Stock_Quantity) {
+                existing.Quantity++;
+                existing.SubTotal = existing.Quantity * existing.Price;
             } else {
                 window.posApp.showNotification('Not enough stock available', 'error');
                 return;
             }
+        } else if (product.Stock_Quantity > 0) {
+            this.cart.push({
+                Product_ID: product.Product_ID,
+                Product_Name: product.Product_Name,
+                Price: product.Price,
+                Quantity: 1,
+                SubTotal: product.Price
+            });
         } else {
-            if (product.Stock_Quantity > 0) {
-                this.cart.push({
-                    Product_ID: product.Product_ID,
-                    Product_Name: product.Product_Name,
-                    Price: product.Price,
-                    Quantity: 1,
-                    SubTotal: product.Price
-                });
-            } else {
-                window.posApp.showNotification('Product out of stock', 'error');
-                return;
-            }
+            window.posApp.showNotification('Product out of stock', 'error');
+            return;
         }
 
         this.updateCartDisplay();
         window.posApp.showNotification(`${product.Product_Name} added to cart`, 'success');
     }
 
-    removeFromCart(productId) {
-        this.cart = this.cart.filter(item => item.Product_ID !== productId);
+    removeFromCart(id) {
+        this.cart = this.cart.filter(i => i.Product_ID !== id);
         this.updateCartDisplay();
     }
 
-    updateQuantity(productId, newQuantity) {
-        const item = this.cart.find(item => item.Product_ID === productId);
-        const product = this.products.find(p => p.Product_ID === productId);
+    updateQuantity(id, qty) {
+        const item = this.cart.find(i => i.Product_ID === id);
+        const product = this.products.find(p => p.Product_ID === id);
 
-        if (item && product) {
-            if (newQuantity <= 0) {
-                this.removeFromCart(productId);
-                return;
-            }
+        if (!item || !product) return;
 
-            if (newQuantity > product.Stock_Quantity) {
-                window.posApp.showNotification('Not enough stock available', 'error');
-                return;
-            }
-
-            item.Quantity = newQuantity;
-            item.SubTotal = item.Quantity * item.Price;
+        if (qty <= 0) {
+            this.removeFromCart(id);
+        } else if (qty > product.Stock_Quantity) {
+            window.posApp.showNotification('Not enough stock available', 'error');
+        } else {
+            item.Quantity = qty;
+            item.SubTotal = qty * item.Price;
             this.updateCartDisplay();
         }
     }
 
     updateCartDisplay() {
-        const cartItems = document.getElementById('cartItems');
-        const subtotalElement = document.getElementById('subtotal');
-        const taxElement = document.getElementById('tax');
-        const totalElement = document.getElementById('total');
-
-        if (!cartItems) return;
+        const cartDiv = document.getElementById('cartItems');
+        if (!cartDiv) return;
 
         if (this.cart.length === 0) {
-            cartItems.innerHTML = `
-                <div class="empty-cart" style="text-align: center; padding: 40px; color: var(--gray);">
-                    <i class="fas fa-shopping-cart" style="font-size: 48px; margin-bottom: 15px;"></i>
+            cartDiv.innerHTML = `
+                <div class="empty-cart" style="text-align:center;padding:40px;color:var(--gray);">
+                    <i class="fas fa-shopping-cart" style="font-size:48px;margin-bottom:15px;"></i>
                     <p>Your cart is empty</p>
-                </div>
-            `;
-        } else {
-            cartItems.innerHTML = '';
-            this.cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
+                </div>`;
+            return;
+        }
+
+        cartDiv.innerHTML = '';
+        this.cart.forEach(item => {
+            cartDiv.innerHTML += `
+                <div class="cart-item">
                     <div class="cart-item-info">
                         <h4>${item.Product_Name}</h4>
                         <div class="price">${window.posApp.formatCurrency(item.Price)} each</div>
                     </div>
                     <div class="cart-item-controls">
                         <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="pos.decreaseQuantity(${item.Product_ID})">
-                                <i class="fas fa-minus"></i>
-                            </button>
+                            <button class="quantity-btn" onclick="pos.decreaseQuantity(${item.Product_ID})"><i class="fas fa-minus"></i></button>
                             <span>${item.Quantity}</span>
-                            <button class="quantity-btn" onclick="pos.increaseQuantity(${item.Product_ID})">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                            <button class="quantity-btn" onclick="pos.increaseQuantity(${item.Product_ID})"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div style="font-weight: 600; margin-left: 15px;">
-                            ${window.posApp.formatCurrency(item.SubTotal)}
-                        </div>
-                        <button class="quantity-btn" onclick="pos.removeFromCart(${item.Product_ID})" style="margin-left: 10px; color: #dc3545;">
+                        <div style="font-weight:600;margin-left:15px;">${window.posApp.formatCurrency(item.SubTotal)}</div>
+                        <button class="quantity-btn" onclick="pos.removeFromCart(${item.Product_ID})" style="margin-left:10px;color:#dc3545;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                `;
-                cartItems.appendChild(cartItem);
-            });
-        }
+                </div>`;
+        });
 
-        // Update totals
-        const subtotal = this.cart.reduce((sum, item) => sum + item.SubTotal, 0);
+        const subtotal = this.cart.reduce((s, i) => s + i.SubTotal, 0);
         const tax = subtotal * this.taxRate;
         const total = subtotal + tax;
 
-        if (subtotalElement) subtotalElement.textContent = window.posApp.formatCurrency(subtotal);
-        if (taxElement) taxElement.textContent = window.posApp.formatCurrency(tax);
-        if (totalElement) totalElement.textContent = window.posApp.formatCurrency(total);
+        document.getElementById('subtotal').textContent = window.posApp.formatCurrency(subtotal);
+        document.getElementById('tax').textContent = window.posApp.formatCurrency(tax);
+        document.getElementById('total').textContent = window.posApp.formatCurrency(total);
     }
 
-    increaseQuantity(productId) {
-        const item = this.cart.find(item => item.Product_ID === productId);
-        if (item) {
-            this.updateQuantity(productId, item.Quantity + 1);
-        }
+    increaseQuantity(id) {
+        const item = this.cart.find(i => i.Product_ID === id);
+        if (item) this.updateQuantity(id, item.Quantity + 1);
     }
 
-    decreaseQuantity(productId) {
-        const item = this.cart.find(item => item.Product_ID === productId);
-        if (item) {
-            this.updateQuantity(productId, item.Quantity - 1);
-        }
+    decreaseQuantity(id) {
+        const item = this.cart.find(i => i.Product_ID === id);
+        if (item) this.updateQuantity(id, item.Quantity - 1);
     }
 
     setupEventListeners() {
-        // Payment method selection
-        document.querySelectorAll('.payment-method').forEach(method => {
-            method.addEventListener('click', () => {
-                document.querySelectorAll('.payment-method').forEach(m => {
-                    m.classList.remove('selected');
-                });
-                method.classList.add('selected');
-                this.selectedPaymentMethod = method.getAttribute('data-method');
+        document.querySelectorAll('.payment-method').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                this.selectedPaymentMethod = btn.getAttribute('data-method');
             });
         });
 
-        // Clear cart
-        const clearCartBtn = document.getElementById('clearCart');
-        if (clearCartBtn) {
-            clearCartBtn.addEventListener('click', () => {
-                this.clearCart();
-            });
-        }
+        document.getElementById('clearCart')?.addEventListener('click', () => this.clearCart());
+        document.getElementById('completeSale')?.addEventListener('click', () => this.completeSale());
 
-        // Complete sale
-        const completeSaleBtn = document.getElementById('completeSale');
-        if (completeSaleBtn) {
-            completeSaleBtn.addEventListener('click', () => {
-                this.completeSale();
-            });
-        }
-
-        // Category filter
-        const categoryFilter = document.getElementById('categoryFilter');
-        if (categoryFilter) {
-            categoryFilter.addEventListener('change', (e) => {
-                this.filterProducts(e.target.value);
-            });
-        }
-
-        // Product search
-        const productSearch = document.getElementById('productSearch');
-        if (productSearch) {
-            productSearch.addEventListener('input', (e) => {
-                this.searchProducts(e.target.value);
-            });
-        }
-    }
-
-    filterProducts(categoryId) {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
-
-        productsGrid.innerHTML = '';
-
-        const filteredProducts = categoryId ? 
-            this.products.filter(product => product.Category_ID == categoryId) : 
-            this.products;
-
-        filteredProducts.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.innerHTML = `
-                <i class="fas fa-box" style="font-size: 32px; color: var(--primary);"></i>
-                <h4>${product.Product_Name}</h4>
-                <div class="price">${window.posApp.formatCurrency(product.Price)}</div>
-                <div class="stock">Stock: ${product.Stock_Quantity}</div>
-            `;
-
-            productCard.addEventListener('click', () => {
-                this.addToCart(product);
-            });
-
-            productsGrid.appendChild(productCard);
-        });
-    }
-
-    searchProducts(searchTerm) {
-        const productsGrid = document.getElementById('productsGrid');
-        if (!productsGrid) return;
-
-        productsGrid.innerHTML = '';
-
-        const filteredProducts = this.products.filter(product => 
-            product.Product_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.Barcode.includes(searchTerm)
-        );
-
-        filteredProducts.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.innerHTML = `
-                <i class="fas fa-box" style="font-size: 32px; color: var(--primary);"></i>
-                <h4>${product.Product_Name}</h4>
-                <div class="price">${window.posApp.formatCurrency(product.Price)}</div>
-                <div class="stock">Stock: ${product.Stock_Quantity}</div>
-            `;
-
-            productCard.addEventListener('click', () => {
-                this.addToCart(product);
-            });
-
-            productsGrid.appendChild(productCard);
-        });
+        document.getElementById('categoryFilter')?.addEventListener('change', e => this.filterProducts(e.target.value));
+        document.getElementById('productSearch')?.addEventListener('input', e => this.searchProducts(e.target.value));
     }
 
     clearCart() {
@@ -335,54 +221,41 @@ class PointOfSale {
             window.posApp.showNotification('Cart is empty', 'error');
             return;
         }
-
         if (!this.selectedPaymentMethod) {
             window.posApp.showNotification('Please select a payment method', 'error');
             return;
         }
 
-        const customerSelect = document.getElementById('customerSelect');
-        const customerId = customerSelect ? customerSelect.value : null;
-        const total = this.cart.reduce((sum, item) => sum + item.SubTotal, 0) * (1 + this.taxRate);
+        const customerId = document.getElementById('customerSelect')?.value || '';
+        const total = this.cart.reduce((s, i) => s + i.SubTotal, 0) * (1 + this.taxRate);
 
         try {
             const formData = new FormData();
             formData.append('action', 'create');
-            formData.append('Customer_ID', customerId || '');
-            formData.append('Cashier_ID', this.currentEmployee.Employee_ID);
+            formData.append('Customer_ID', customerId);
+            formData.append('User_Role', this.currentUser.Role);
+            formData.append('Username', this.currentUser.Username);
             formData.append('TotalAmount', total);
             formData.append('Payment_Method', this.selectedPaymentMethod);
             formData.append('items', JSON.stringify(this.cart));
 
-            const response = await fetch('php/sales/sales.php', {
-                method: 'POST',
-                body: formData
-            });
+            const res = await fetch('php/sales/sales.php', { method: 'POST', body: formData });
+            const result = await res.json();
 
-            const result = await response.json();
-            
             if (result.success) {
-                window.posApp.showNotification(`Sale completed successfully! Transaction ID: #${result.Sale_ID}`, 'success');
+                window.posApp.showNotification(`Sale completed! Transaction ID: #${result.Sale_ID}`, 'success');
                 this.clearCart();
-                document.querySelectorAll('.payment-method').forEach(m => {
-                    m.classList.remove('selected');
-                });
+                document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('selected'));
                 this.selectedPaymentMethod = null;
-                if (customerSelect) customerSelect.value = '';
-                
-                // Reload products to update stock
                 await this.loadProducts();
             } else {
                 window.posApp.showNotification('Error completing sale: ' + result.message, 'error');
             }
-        } catch (error) {
-            console.error('Error completing sale:', error);
+        } catch (err) {
+            console.error('Error completing sale:', err);
             window.posApp.showNotification('Error completing sale', 'error');
         }
     }
 }
 
-// Initialize POS when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    window.pos = new PointOfSale();
-});
+document.addEventListener('DOMContentLoaded', () => window.pos = new PointOfSale());
