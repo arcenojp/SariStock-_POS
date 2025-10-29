@@ -7,15 +7,15 @@ class ReportsManager {
     }
 
     async init() {
-        // Set default date range first
+       
         this.setDefaultDateRange();
         
-        // Load KPI data and charts
+       
         await this.loadKPIData();
         await this.generateSalesChart();
         await this.generateProductsChart();
         
-        // Load the initial report table - THIS IS CRUCIAL
+       
         await this.loadReportTable('sales');
         
         this.setupEventListeners();
@@ -28,7 +28,7 @@ class ReportsManager {
         if (startDate && endDate) {
             const end = new Date();
             const start = new Date();
-            start.setDate(end.getDate() - 30); // Last 30 days
+            start.setDate(end.getDate() - 30); 
             
             startDate.value = start.toISOString().split('T')[0];
             endDate.value = end.toISOString().split('T')[0];
@@ -64,7 +64,7 @@ class ReportsManager {
                 const totalTransactions = salesData.length;
                 const averageOrder = totalTransactions > 0 ? totalSales / totalTransactions : 0;
                 
-                // Get products for category analysis
+                
                 try {
                     const productsFormData = new FormData();
                     productsFormData.append('action', 'read');
@@ -174,13 +174,12 @@ class ReportsManager {
         }
     }
 
-    // Similar to your dashboard's getRecentTransactions method
     async fetchSalesData() {
         try {
             const formData = new FormData();
             formData.append('action', 'read');
 
-            // Add date filters if available
+           
             const startDate = document.getElementById('reportStartDate')?.value;
             const endDate = document.getElementById('reportEndDate')?.value;
             if (startDate) formData.append('start_date', startDate);
@@ -197,10 +196,10 @@ class ReportsManager {
                 return result.data.map(sale => [
                     new Date(sale.Sale_Date).toLocaleDateString(),
                     `#${sale.Sale_ID}`,
-                    sale.customer_name || 'Walk-in Customer',
+                    sale.customer_name || sale.Name || 'Walk-in Customer',
                     this.formatCurrency(sale.TotalAmount || 0),
-                    sale.Payment_Method,
-                    sale.Status
+                    sale.Payment_Method || 'Cash',
+                    sale.Status || 'Completed'
                 ]);
             }
             return [['No sales data available', '', '', '', '', '']];
@@ -258,7 +257,7 @@ class ReportsManager {
                     customer.Address || 'N/A'
                 ]);
             }
-            // Fallback to sample data if API fails
+            
             return [
                 ['John Doe', '1234567890', 'john@example.com', 'Sample Address'],
                 ['Jane Smith', '0987654321', 'jane@example.com', 'Sample Address 2']
@@ -292,7 +291,7 @@ class ReportsManager {
                     employee.Status
                 ]);
             }
-            // Fallback to sample data if API fails
+           
             return [
                 ['Sarah Johnson', 'sarah', 'Admin', 'Active'],
                 ['Mike Wilson', 'mike', 'Cashier', 'Active']
@@ -315,7 +314,7 @@ class ReportsManager {
             return;
         }
 
-        // Update headers
+        
         reportHeaders.innerHTML = '';
         headers.forEach(header => {
             const th = document.createElement('th');
@@ -323,7 +322,6 @@ class ReportsManager {
             reportHeaders.appendChild(th);
         });
 
-        // Update table data
         reportTable.innerHTML = '';
         
         if (!data || data.length === 0) {
@@ -388,7 +386,7 @@ class ReportsManager {
             });
         }
 
-        // Add date change listeners to refresh data
+        
         const startDate = document.getElementById('reportStartDate');
         const endDate = document.getElementById('reportEndDate');
         
@@ -420,7 +418,7 @@ class ReportsManager {
     }
 
     showNotification(message, type = 'info') {
-        // Simple notification implementation
+        
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed;
@@ -575,21 +573,47 @@ class ReportsManager {
 
     async generateProductsChart() {
         try {
-            const response = await fetch('php/products/products.php', {
-                method: 'POST',
-                body: new FormData()
-            });
-
+         
+            const response = await fetch('php/backend/top_products.php');
             const result = await response.json();
             
-            if (result.success) {
-                this.createProductsChart(result.data);
+            if (result && result.length > 0) {
+                this.createProductsChart(result);
             } else {
-                this.createProductsChart([]);
+                
+                const productsFormData = new FormData();
+                productsFormData.append('action', 'read');
+                
+                const productsResponse = await fetch('php/products/products.php', {
+                    method: 'POST',
+                    body: productsFormData
+                });
+                
+                const productsResult = await productsResponse.json();
+                
+                if (productsResult.success) {
+                    this.createProductsChart(productsResult.data);
+                } else {
+                    this.createProductsChart([]);
+                }
             }
         } catch (error) {
             console.error('Error generating products chart:', error);
-            this.createProductsChart([]);
+           
+            try {
+                const productsFormData = new FormData();
+                productsFormData.append('action', 'read');
+                
+                const productsResponse = await fetch('php/products/products.php', {
+                    method: 'POST',
+                    body: productsFormData
+                });
+                
+                const productsResult = await productsResponse.json();
+                this.createProductsChart(productsResult.data || []);
+            } catch (fallbackError) {
+                this.createProductsChart([]);
+            }
         }
     }
 
@@ -624,41 +648,63 @@ class ReportsManager {
     }
 
     processProductsDataForChart(productsData) {
-        if (!productsData || productsData.length === 0) {
+        
+        if (productsData && productsData.length > 0 && productsData[0].total_sold !== undefined) {
+            const labels = productsData.map(p => p.Product_Name);
+            const data = productsData.map(p => parseInt(p.total_sold) || 0);
+            
             return {
-                labels: ['Product A', 'Product B', 'Product C', 'Product D', 'Product E'],
+                labels: labels,
                 datasets: [{
-                    data: [35, 25, 15, 12, 8],
+                    label: 'Quantity Sold',
+                    data: data,
+                    backgroundColor: [
+                        '#4361ee',
+                        '#4cc9f0', 
+                        '#f72585',
+                        '#7209b7',
+                        '#3a0ca3'
+                    ].slice(0, labels.length),
+                    borderWidth: 0
+                }]
+            };
+        }
+        
+        
+        if (productsData && productsData.length > 0) {
+            
+            const sortedProducts = productsData
+                .filter(p => p.Status === 'Active')
+                .sort((a, b) => (b.Stock_Quantity || 0) - (a.Stock_Quantity || 0))
+                .slice(0, 5);
+            
+            const labels = sortedProducts.map(p => p.Product_Name);
+            const data = sortedProducts.map(p => p.Stock_Quantity || 0);
+            
+            return {
+                labels: labels,
+                datasets: [{
+                    label: 'Stock Quantity',
+                    data: data,
                     backgroundColor: [
                         '#4361ee',
                         '#4cc9f0',
                         '#f72585',
                         '#7209b7',
                         '#3a0ca3'
-                    ],
+                    ].slice(0, labels.length),
                     borderWidth: 0
                 }]
             };
         }
         
-        const sortedProducts = productsData
-            .sort((a, b) => b.Stock_Quantity - a.Stock_Quantity)
-            .slice(0, 5);
-        
-        const labels = sortedProducts.map(p => p.Product_Name);
-        const data = sortedProducts.map(p => p.Stock_Quantity);
-        
+       
         return {
-            labels: labels,
+            labels: ['No products found'],
             datasets: [{
-                data: data,
-                backgroundColor: [
-                    '#4361ee',
-                    '#4cc9f0',
-                    '#f72585',
-                    '#7209b7',
-                    '#3a0ca3'
-                ].slice(0, labels.length),
+                label: 'Data',
+                data: [1],
+                backgroundColor: ['#4361ee'],
                 borderWidth: 0
             }]
         };
