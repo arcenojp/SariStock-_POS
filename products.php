@@ -1,7 +1,8 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json');
-require_once 'config.php';
+require_once __DIR__ . '/../config.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -15,7 +16,6 @@ try {
             $categoryID = $_POST['Category_ID'];
             $price = $_POST['Price'];
             $stockQuantity = $_POST['Stock_Quantity'];
-            $barcode = trim($_POST['Barcode'] ?? '');
             $status = $_POST['Status'];
 
             if (empty($productName) || empty($categoryID) || empty($price)) {
@@ -23,15 +23,14 @@ try {
                 break;
             }
 
-            $sql = "INSERT INTO product (Product_Name, Category_ID, Price, Stock_Quantity, Barcode, Status) 
-                    VALUES (:product_name, :category_id, :price, :stock_quantity, :barcode, :status)";
+            $sql = "INSERT INTO product (Product_Name, Category_ID, Price, Stock_Quantity, Status) 
+                    VALUES (:product_name, :category_id, :price, :stock_quantity, :status)";
             
             $stmt = $db->prepare($sql);
             $stmt->bindParam(':product_name', $productName);
             $stmt->bindParam(':category_id', $categoryID);
             $stmt->bindParam(':price', $price);
             $stmt->bindParam(':stock_quantity', $stockQuantity);
-            $stmt->bindParam(':barcode', $barcode);
             $stmt->bindParam(':status', $status);
 
             if ($stmt->execute()) {
@@ -48,10 +47,9 @@ try {
             $search = $_POST['search'] ?? '';
 
             if ($productId) {
-                // Read single product
                 $sql = "SELECT p.*, c.Category_Name 
                         FROM product p 
-                        LEFT JOIN categories c ON p.Category_ID = c.Category_ID 
+                        LEFT JOIN category c ON p.Category_ID = c.Category_ID 
                         WHERE p.Product_ID = :product_id";
                 $stmt = $db->prepare($sql);
                 $stmt->bindParam(':product_id', $productId);
@@ -64,10 +62,9 @@ try {
                     echo json_encode(['success' => false, 'message' => 'Product not found']);
                 }
             } else {
-                // Read all products with filters
                 $sql = "SELECT p.*, c.Category_Name 
                         FROM product p 
-                        LEFT JOIN categories c ON p.Category_ID = c.Category_ID 
+                        LEFT JOIN category c ON p.Category_ID = c.Category_ID 
                         WHERE 1=1";
                 $params = [];
 
@@ -82,7 +79,7 @@ try {
                 }
 
                 if (!empty($search)) {
-                    $sql .= " AND (p.Product_Name LIKE :search OR p.Barcode LIKE :search)";
+                    $sql .= " AND (p.Product_Name LIKE :search OR p. LIKE :search)";
                     $searchTerm = "%$search%";
                     $params[':search'] = $searchTerm;
                 }
@@ -106,7 +103,6 @@ try {
             $categoryID = $_POST['Category_ID'];
             $price = $_POST['Price'];
             $stockQuantity = $_POST['Stock_Quantity'];
-            $barcode = trim($_POST['Barcode'] ?? '');
             $status = $_POST['Status'];
 
             if (empty($productName) || empty($categoryID) || empty($price)) {
@@ -116,7 +112,7 @@ try {
 
             $sql = "UPDATE product 
                     SET Product_Name = :product_name, Category_ID = :category_id, Price = :price, 
-                        Stock_Quantity = :stock_quantity, Barcode = :barcode, Status = :status 
+                        Stock_Quantity = :stock_quantity,  Status = :status 
                     WHERE Product_ID = :product_id";
             
             $stmt = $db->prepare($sql);
@@ -124,7 +120,6 @@ try {
             $stmt->bindParam(':category_id', $categoryID);
             $stmt->bindParam(':price', $price);
             $stmt->bindParam(':stock_quantity', $stockQuantity);
-            $stmt->bindParam(':barcode', $barcode);
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':product_id', $productId);
 
