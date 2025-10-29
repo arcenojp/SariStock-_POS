@@ -11,9 +11,7 @@ $action = $_POST['action'] ?? '';
 try {
     switch ($action) {
 
-        // -----------------------------
-        // CREATE SALE
-        // -----------------------------
+      
         case 'create':
             $customerId = $_POST['Customer_ID'] ?? null;
             $cashierId = $_POST['Cashier_ID'] ?? ($_SESSION['employee_id'] ?? $_SESSION['user_id'] ?? 0);
@@ -32,7 +30,7 @@ try {
             $db->beginTransaction();
 
             try {
-                // Insert sale
+              
                 $sql = "INSERT INTO sales (Sale_Date, Customer_ID, Cashier_ID, TotalAmount, Payment_Method, Status)
                         VALUES (NOW(), :customer_id, :cashier_id, :total_amount, :payment_method, 'Completed')";
                 $stmt = $db->prepare($sql);
@@ -44,12 +42,12 @@ try {
 
                 $saleId = $db->lastInsertId();
 
-                // Insert sale items
+                
                 $itemSql = "INSERT INTO sales_detail (Sale_ID, Product_ID, Quantity, Price, SubTotal)
                             VALUES (:sale_id, :product_id, :quantity, :price, :subtotal)";
                 $itemStmt = $db->prepare($itemSql);
 
-                // Update stock
+                
                 $updateSql = "UPDATE product 
                               SET Stock_Quantity = Stock_Quantity - :quantity 
                               WHERE Product_ID = :product_id";
@@ -86,9 +84,7 @@ try {
             }
             break;
 
-        // -----------------------------
-        // READ SALE(S)
-        // -----------------------------
+        
         case 'read':
             $saleId = $_POST['Sale_ID'] ?? null;
             $startDate = $_POST['start_date'] ?? null;
@@ -97,7 +93,7 @@ try {
             $status = $_POST['Status'] ?? null;
 
             if ($saleId) {
-                // Single sale with items
+                
                 $saleSql = "SELECT s.*, c.Name AS customer_name, e.Full_Name AS cashier_name
                             FROM sales s
                             LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID
@@ -124,7 +120,7 @@ try {
                 }
 
             } else {
-                // All sales with filters
+                
                 $sql = "SELECT s.*, c.Name AS customer_name, e.Full_Name AS cashier_name
                         FROM sales s
                         LEFT JOIN customer c ON s.Customer_ID = c.Customer_ID
@@ -163,9 +159,7 @@ try {
             }
             break;
 
-        // -----------------------------
-        // UPDATE SALE STATUS
-        // -----------------------------
+       
         case 'update':
             $saleId = $_POST['Sale_ID'] ?? null;
             $status = $_POST['Status'] ?? null;
@@ -187,9 +181,7 @@ try {
             }
             break;
 
-        // -----------------------------
-        // INVALID ACTION
-        // -----------------------------
+    
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
