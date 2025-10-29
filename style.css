@@ -615,16 +615,4 @@ td {
     z-index: 1000;
     align-items: center;
     justify-content: center;
-
-}
-#createBackupBtn {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
-    padding: 12px 20px;
-    font-weight: 600;
-}
-
-#createBackupBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
 }
