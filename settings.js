@@ -118,7 +118,7 @@ class SettingsManager {
             receiptHeader: 'Thank you for shopping with us!',
             receiptFooter: 'Please come again!',
             showTax: true,
-            showBarcode: true,
+            show: true,
             receiptWidth: 42
         };
     }
@@ -149,7 +149,7 @@ class SettingsManager {
         if (document.getElementById('receiptHeader')) document.getElementById('receiptHeader').value = settings.receiptHeader;
         if (document.getElementById('receiptFooter')) document.getElementById('receiptFooter').value = settings.receiptFooter;
         if (document.getElementById('showTax')) document.getElementById('showTax').checked = settings.showTax;
-        if (document.getElementById('showBarcode')) document.getElementById('showBarcode').checked = settings.showBarcode;
+        if (document.getElementById('show')) document.getElementById('show').checked = settings.show;
         if (document.getElementById('receiptWidth')) document.getElementById('receiptWidth').value = settings.receiptWidth;
     }
 
@@ -197,7 +197,6 @@ class SettingsManager {
             receiptHeader: document.getElementById('receiptHeader').value,
             receiptFooter: document.getElementById('receiptFooter').value,
             showTax: document.getElementById('showTax').checked,
-            showBarcode: document.getElementById('showBarcode').checked,
             receiptWidth: document.getElementById('receiptWidth').value
         };
 
